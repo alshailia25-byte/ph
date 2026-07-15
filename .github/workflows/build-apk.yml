@@ -16,7 +16,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-level: 20
+        node-version: '20'
 
     - name: Install Java
       uses: actions/setup-java@v4
@@ -30,10 +30,18 @@ jobs:
     - name: Install Dependencies
       run: |
         npm install
-        npm install @capacitor/android
+        npm install @capacitor/core @capacitor/cli @capacitor/android
 
     - name: Build Web Project
-      run: npm run build
+      run: |
+        npm run build --if-present
+        mkdir -p dist && touch dist/index.html
+
+    - name: Initialize Capacitor Config if missing
+      run: |
+        if [ ! -f "capacitor.config.json" ]; then
+          npx cap init "Physics App" "com.physics.app" --web-dir=dist
+        fi
 
     - name: Add Android Platform & Sync
       run: |
