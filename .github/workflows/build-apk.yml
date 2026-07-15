@@ -32,10 +32,22 @@ jobs:
         npm install
         npm install @capacitor/core @capacitor/cli @capacitor/android
 
+    - name: Prepare Files for Vite Build
+      run: |
+        # إنشاء مجلد src ونقل الملفات البرمجية إليه لتتوافق مع إعدادات Vite الافتراضية
+        mkdir -p src
+        cp App.jsx src/ 2>/dev/null || true
+        cp main.jsx src/ 2>/dev/null || true
+        cp index.css src/ 2>/dev/null || true
+
     - name: Build Web Project
       run: |
         npm run build --if-present
-        mkdir -p dist && touch dist/index.html
+        # في حال لم يتم إنشاء مجلد dist، نقوم بإنشائه كنسخة احتياطية
+        if [ ! -d "dist" ]; then
+          mkdir -p dist
+          cp index.html dist/
+        fi
 
     - name: Initialize Capacitor Config if missing
       run: |
@@ -58,3 +70,4 @@ jobs:
       with:
         name: Physics-App-APK
         path: android/app/build/outputs/apk/debug/app-debug.apk
+
